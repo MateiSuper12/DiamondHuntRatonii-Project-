@@ -7,21 +7,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;700&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;display:grid;place-items:center;padding:16px;font:16px/1.6 Rubik,system-ui,sans-serif;color:#f6ecd2;background:linear-gradient(#3f7be0,#78b5f9 30%,#1d3c16 100%)}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;padding:16px;font:16px/1.6 Rubik,system-ui,sans-serif;color:#f6ecd2;background-color:#50341f;background-image:linear-gradient(90deg,transparent 0 96%,rgba(24,14,8,.55) 96% 100%),linear-gradient(0deg,transparent 0 96%,rgba(24,14,8,.55) 96% 100%),linear-gradient(135deg,rgba(197,139,74,.24) 25%,transparent 25% 75%,rgba(35,21,12,.22) 75%),linear-gradient(45deg,rgba(35,21,12,.18) 25%,transparent 25% 75%,rgba(197,139,74,.18) 75%);background-size:64px 32px,64px 32px,64px 32px,64px 32px;background-position:0 0,0 0,0 0,32px 16px;background-attachment:fixed}
     .game{width:100%;max-width:800px;text-align:center;padding:20px 14px;border:3px solid #000;background:#1b1208;box-shadow:inset 0 0 0 3px #d4a017,0 10px 40px #0008}
     h1{margin:0;font:400 clamp(13px,3.8vw,22px)/1.6 'Press Start 2P',monospace;color:#f5c542;text-shadow:3px 3px #3a2600}
     .gbox{position:relative;width:min(100%,720px);margin:14px auto 0;border:4px solid #000;box-shadow:0 0 0 3px #d4a017}
     .gc{display:block;width:100%;height:auto;touch-action:none;background:#10243f;cursor:ew-resize;image-rendering:pixelated}
     .gov{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:10px;padding:14px;background:rgba(5,9,13,.58)}
-    .gov[hidden]{display:none}
+    .gov[hidden],.hud[hidden]{display:none}
     .gt{font:400 clamp(.8rem,3.6vw,1.1rem)/1.5 'Press Start 2P',monospace;color:#f5c542}
     .gd{max-width:480px;font-size:.92rem;color:#fff4d8;text-shadow:1px 1px #000}
     .btn{display:inline-block;padding:11px 22px;font:700 .95rem Rubik,sans-serif;cursor:pointer;text-decoration:none;color:#1a1206;background:linear-gradient(#ffe27a,#f0a800);border:3px solid #000;border-radius:0;box-shadow:0 5px 0 #000;transition:filter .12s ease}
     .btn:hover{filter:brightness(1.1)}
+    .hud{position:absolute;z-index:1;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+    .hud span{padding:7px 10px;border:2px solid #000;background:rgba(20,14,8,.88);color:#ffe27a;font:12px 'Press Start 2P',monospace;text-shadow:1px 1px #000}
     .prize{display:none}.game.won .prize{display:block}.game.won .gbox{display:none}
     .kw{display:block;margin:12px 0 14px;font:400 clamp(.8rem,4.2vw,1.3rem) 'Press Start 2P',monospace;color:#f5c542;word-break:break-all;user-select:all}
     .lk{margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.lk .btn{font-size:.8rem;padding:8px 14px}
-    @media(max-width:520px){body{padding:8px}.game{padding:16px 10px}.gd{font-size:.82rem}.lk{flex-direction:column}.lk .btn{width:100%}}
+    @media(max-width:520px){body{padding:8px}.game{padding:16px 10px}.gd{font-size:.82rem}.lk{flex-direction:column}.lk .btn{width:100%}.hud span{font-size:9px;padding:6px}}
   </style>
   <script src="script.js" defer></script>
 </head>
@@ -31,6 +33,7 @@
     <p style="margin:10px 0 0;color:#c9b886;font-size:.9rem">Aici este păzit cuvântul-cheie pentru Staff Apply.</p>
     <div class="gbox">
       <canvas class="gc" width="720" height="480" aria-label="Mini-joc: prinde diamante și smaralde"></canvas>
+      <div class="hud" hidden><span>SCOR: <b class="score">0</b></span><span>VIEȚI: <b class="lives">3</b></span></div>
       <div class="gov">
         <div class="gt">DIAMANTE</div>
         <div class="gd">Mișcă cufărul (mouse, deget sau tastele ← →) și prinde <b>20 de puncte</b>: diamant = 1, smarald = 3. Ferește-te de TNT! Ai 3 vieți.</div>
