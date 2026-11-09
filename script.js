@@ -17,7 +17,8 @@
   const WIDTH = canvas.width;
   const HEIGHT = canvas.height;
   const TARGET_SCORE = 20;
-  const CHEST_ANIMATION_MS = 2200;
+  // Keep the opening chest visible longer; collecting another item extends it.
+  const CHEST_ANIMATION_MS = 6000;
   const player = { x: WIDTH / 2, y: HEIGHT - 38, width: 86, height: 60, speed: 8 };
   const items = [];
   const keys = new Set();
@@ -28,11 +29,12 @@
   let spawnTimer = 0;
   let animationFrame = 0;
   let chestGifTimer = 0;
-  let chestGifRequest = 0;
+  let chestGifLoaded = false;
+  let chestGifPending = false;
   let chestGifVisible = false;
 
-  // Use an HTML image so the browser plays the animated GIF. It is aligned to
-  // the collector's canvas position and fully replaces the closed chest.
+  // Load the GIF once. Reassigning its URL on every pickup restarted the
+  // animation and could make it flash or disappear while loading.
   const chestGif = document.createElement("img");
   chestGif.alt = "Cufăr care se deschide";
   chestGif.setAttribute("aria-hidden", "true");
@@ -72,36 +74,40 @@
     chestGif.style.height = `${player.height / HEIGHT * canvasRect.height}px`;
   }
 
-  function playChestAnimation() {
-    const request = ++chestGifRequest;
-    window.clearTimeout(chestGifTimer);
-    chestGifVisible = false;
-    chestGif.style.display = "none";
+  function showChestAnimation() {
+    positionChestGif();
+    chestGifVisible = true;
+    chestGif.style.display = "block";
+    drawScene();
 
-    const gifUrl = new URL("assets/Chest.gif", document.baseURI);
-    gifUrl.searchParams.set("play", `${Date.now()}-${request}`);
-    chestGif.onload = () => {
-      if (request !== chestGifRequest) return;
-      positionChestGif();
-      chestGifVisible = true;
-      chestGif.style.display = "block";
-      drawScene();
-      chestGifTimer = window.setTimeout(() => {
-        if (request !== chestGifRequest) return;
-        chestGifVisible = false;
-        chestGif.style.display = "none";
-        drawScene();
-      }, CHEST_ANIMATION_MS);
-    };
-    chestGif.onerror = () => {
-      if (request !== chestGifRequest) return;
+    // Extend the current display period without reloading/restarting the GIF.
+    window.clearTimeout(chestGifTimer);
+    chestGifTimer = window.setTimeout(() => {
       chestGifVisible = false;
       chestGif.style.display = "none";
-      console.error(`Nu s-a putut încărca animația cufărului: ${gifUrl.href}`);
       drawScene();
-    };
-    chestGif.src = gifUrl.href;
+    }, CHEST_ANIMATION_MS);
   }
+
+  function playChestAnimation() {
+    if (!chestGifLoaded) {
+      chestGifPending = true;
+      return;
+    }
+    chestGifPending = false;
+    showChestAnimation();
+  }
+
+  chestGif.addEventListener("load", () => {
+    chestGifLoaded = true;
+    if (chestGifPending) playChestAnimation();
+  });
+  chestGif.addEventListener("error", () => {
+    chestGifPending = false;
+    console.error(`Nu s-a putut încărca animația cufărului: ${chestGif.src}`);
+    drawScene();
+  });
+  chestGif.src = new URL("assets/Chest.gif", document.baseURI).href;
 
   function drawBackground() {
     if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
@@ -146,8 +152,8 @@
   }
 
   function drawPlayer() {
-    // Hide the closed chest while the GIF plays, so the GIF replaces it rather
-    // than appearing as a second chest on top.
+    // Hide the closed chest while the GIF plays, so it replaces rather than
+    // appearing as a second chest on top.
     if (chestGifVisible) return;
 
     const x = Math.round(player.x - player.width / 2);
@@ -237,10 +243,9 @@
   function startGame() {
     score = 0; lives = 3; player.x = WIDTH / 2; items.length = 0; spawnTimer = 0;
     window.clearTimeout(chestGifTimer);
-    chestGifRequest += 1;
     chestGifVisible = false;
+    chestGifPending = false;
     chestGif.style.display = "none";
-    chestGif.removeAttribute("src");
     lastTime = performance.now(); running = true;
     game.classList.remove("won"); prize.style.display = "none"; keyword.textContent = "";
     updateHud(); hud.hidden = false; overlay.hidden = true;
