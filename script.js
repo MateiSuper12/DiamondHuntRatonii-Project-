@@ -16,7 +16,8 @@
   const WIDTH = canvas.width;
   const HEIGHT = canvas.height;
   const TARGET_SCORE = 20;
-  const player = { x: WIDTH / 2, y: HEIGHT - 38, width: 86, height: 60, speed: 8, openProgress: 0 };
+  const CHEST_ANIMATION_MS = 1400;
+  const player = { x: WIDTH / 2, y: HEIGHT - 38, width: 86, height: 60, speed: 8 };
   const items = [];
   const keys = new Set();
   let score = 0;
@@ -25,6 +26,9 @@
   let lastTime = 0;
   let spawnTimer = 0;
   let animationFrame = 0;
+  let chestAnimationImage = null;
+  let chestAnimationUntil = 0;
+  let chestAnimationStarted = 0;
 
   function loadImage(path) {
     const image = new Image();
@@ -38,7 +42,22 @@
   const diamondImage = loadImage("assets/Diamond_JE3_BE3.png");
   const emeraldImage = loadImage("assets/Emerald_JE3_BE3.webp");
   const chestClosedImage = loadImage("assets/Chest (1).webp");
-  const chestOpeningImage = loadImage("assets/Chest.gif");
+
+  function playChestAnimation() {
+    const now = performance.now();
+    chestAnimationStarted = now;
+    chestAnimationUntil = now + CHEST_ANIMATION_MS;
+
+    // A fresh GIF image restarts its animation on every collected item.
+    const gifUrl = new URL("assets/Chest.gif", document.baseURI);
+    gifUrl.searchParams.set("play", String(Math.floor(now)));
+    chestAnimationImage = new Image();
+    chestAnimationImage.addEventListener("load", drawScene, { once: true });
+    chestAnimationImage.addEventListener("error", () => {
+      console.error(`Nu s-a putut încărca animația cufărului: ${gifUrl.href}`);
+    }, { once: true });
+    chestAnimationImage.src = gifUrl.href;
+  }
 
   function drawBackground() {
     if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
@@ -71,48 +90,42 @@
     context.beginPath(); context.moveTo(item.x, item.y - 14); context.lineTo(item.x + 12, item.y - 4); context.lineTo(item.x + 9, item.y + 10); context.lineTo(item.x, item.y + 15); context.lineTo(item.x - 9, item.y + 10); context.lineTo(item.x - 12, item.y - 4); context.closePath(); context.fill();
   }
 
-  function drawChestImage(image, x, y, width, height, alpha = 1) {
-    if (!image || !image.complete || image.naturalWidth <= 0) return false;
-    context.save();
-    context.globalAlpha = alpha;
-    context.drawImage(image, x, y, width, height);
-    context.restore();
-    return true;
-  }
-
   function drawPlayer() {
-    const x = Math.round(player.x - player.width / 2);
-    const y = Math.round(player.y - 12);
-    const bob = Math.sin((performance.now() || 0) / 150) * 2;
-    const chestScale = 1 + player.openProgress * 0.12;
-    const chestWidth = Math.round(player.width * chestScale);
-    const chestHeight = Math.round(player.height * chestScale);
-    const chestX = Math.round(player.x - chestWidth / 2);
-    const chestY = Math.round(y + bob);
+    const now = performance.now();
+    const animating = now < chestAnimationUntil;
+    const progress = animating ? Math.max(0, 1 - (now - chestAnimationStarted) / CHEST_ANIMATION_MS) : 0;
+    const bob = animating ? -Math.sin(progress * Math.PI) * 9 : 0;
+    const scale = animating ? 1 + Math.sin(progress * Math.PI) * 0.12 : 1;
+    const width = Math.round(player.width * scale);
+    const height = Math.round(player.height * scale);
+    const x = Math.round(player.x - width / 2);
+    const y = Math.round(player.y - 12 + bob);
+    const gifReady = chestAnimationImage && chestAnimationImage.complete && chestAnimationImage.naturalWidth > 0;
+    const image = animating && gifReady ? chestAnimationImage : chestClosedImage;
 
-    const hasOpenGif = chestOpeningImage.complete && chestOpeningImage.naturalWidth > 0;
-    const isAnimating = player.openProgress > 0.08;
-    const activeImage = isAnimating && hasOpenGif ? chestOpeningImage : chestClosedImage;
-
-    if (drawChestImage(activeImage, chestX, chestY, chestWidth, chestHeight, isAnimating ? 0.9 + player.openProgress * 0.1 : 1)) {
-      if (player.openProgress > 0.06) {
+    if (image.complete && image.naturalWidth > 0) {
+      if (animating) {
         context.save();
-        context.globalAlpha = 0.2 + player.openProgress * 0.45;
-        context.fillStyle = "#f5d76e";
+        context.globalAlpha = 0.25 + Math.sin(progress * Math.PI) * 0.35;
+        context.fillStyle = "#ffe779";
         context.beginPath();
-        context.arc(player.x, player.y - 5, 26 + player.openProgress * 18, 0, Math.PI * 2);
+        context.ellipse(player.x, player.y + 10, 48 + Math.sin(progress * Math.PI) * 10, 22, 0, 0, Math.PI * 2);
         context.fill();
         context.restore();
       }
+      context.imageSmoothingEnabled = true;
+      context.drawImage(image, x, y, width, height);
+      context.imageSmoothingEnabled = false;
       return;
     }
 
+    // Visible fallback if an image has not loaded yet.
     context.fillStyle = "#553316";
-    context.fillRect(x, player.y, player.width, player.height);
+    context.fillRect(x, player.y, width, height);
     context.fillStyle = "#a96b2d";
-    context.fillRect(x + 4, player.y + 4, player.width - 8, player.height - 8);
+    context.fillRect(x + 4, player.y + 4, width - 8, height - 8);
     context.fillStyle = "#e4b85e";
-    context.fillRect(x + 8, player.y + 7, player.width - 16, 3);
+    context.fillRect(x + 8, player.y + 7, width - 16, 3);
     context.fillStyle = "#f5c542";
     context.fillRect(player.x - 5, player.y + 11, 10, 9);
     context.fillStyle = "#3a2600";
@@ -160,19 +173,16 @@
     if (keys.has("ArrowLeft") || keys.has("a")) player.x -= player.speed * delta;
     if (keys.has("ArrowRight") || keys.has("d")) player.x += player.speed * delta;
     player.x = Math.max(player.width / 2, Math.min(WIDTH - player.width / 2, player.x));
-    player.openProgress = Math.max(0, player.openProgress * 0.82 - 0.03);
     spawnTimer += delta;
     if (spawnTimer > 30) { spawnItem(); spawnTimer = 0; }
 
     for (let i = items.length - 1; i >= 0; i -= 1) {
       const item = items[i]; item.y += item.speed * delta;
       if (intersects(item)) {
-        if (item.type === "tnt") {
-          lives -= 1;
-          player.openProgress = Math.max(player.openProgress, 0.45);
-        } else {
+        if (item.type === "tnt") lives -= 1;
+        else {
           score += item.type === "emerald" ? 3 : 1;
-          player.openProgress = Math.min(1, player.openProgress + 0.85);
+          playChestAnimation();
         }
         items.splice(i, 1);
         updateHud();
@@ -185,7 +195,7 @@
   }
 
   function startGame() {
-    score = 0; lives = 3; player.x = WIDTH / 2; player.openProgress = 0; items.length = 0; spawnTimer = 0; lastTime = performance.now(); running = true;
+    score = 0; lives = 3; player.x = WIDTH / 2; items.length = 0; spawnTimer = 0; chestAnimationUntil = 0; chestAnimationImage = null; lastTime = performance.now(); running = true;
     game.classList.remove("won"); prize.style.display = "none"; keyword.textContent = "";
     updateHud(); hud.hidden = false; overlay.hidden = true;
     cancelAnimationFrame(animationFrame);
