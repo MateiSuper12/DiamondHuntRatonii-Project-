@@ -1,143 +1,120 @@
 (() => {
-  const canvas = document.querySelector("#game-canvas");
+  const canvas = document.querySelector(".gc");
   const context = canvas.getContext("2d");
-  const overlay = document.querySelector("#overlay");
-  const overlayTitle = document.querySelector("#overlay-title");
-  const overlayDescription = document.querySelector("#overlay-description");
-  const startButton = document.querySelector("#start-button");
-  const scoreOutput = document.querySelector("#score");
-  const livesOutput = document.querySelector("#lives");
-  const prize = document.querySelector("#prize");
-  const copyButton = document.querySelector("#copy-button");
-  const keyword = document.querySelector("#keyword");
+  const game = document.querySelector(".game");
+  const overlay = document.querySelector(".gov");
+  const overlayTitle = document.querySelector(".gt");
+  const overlayDescription = document.querySelector(".gd");
+  const startButton = document.querySelector(".gs");
+  const prize = document.querySelector(".prize");
+  const copyButton = document.querySelector(".kc");
+  const keyword = document.querySelector(".kw");
 
   const WIDTH = canvas.width;
   const HEIGHT = canvas.height;
   const TARGET_SCORE = 20;
-  const player = { x: WIDTH / 2, y: HEIGHT - 34, width: 58, height: 24, speed: 6 };
+  const player = { x: WIDTH / 2, y: HEIGHT - 38, width: 66, height: 28, speed: 8 };
   const items = [];
+  const keys = new Set();
   let score = 0;
   let lives = 3;
   let running = false;
   let lastTime = 0;
   let spawnTimer = 0;
   let animationFrame = 0;
-  const keys = new Set();
 
-  const backgroundImage = new Image();
-  backgroundImage.src = "26262708.png";
+  function loadImage(path) {
+    const image = new Image();
+    image.src = new URL(path, document.baseURI).href;
+    image.addEventListener("load", drawScene);
+    image.addEventListener("error", () => console.error(`Nu s-a putut încărca imaginea: ${image.src}`));
+    return image;
+  }
 
-  const diamondImage = new Image();
-  diamondImage.src = "Diamond_JE3_BE3.png";
-
-  const emeraldImage = new Image();
-  emeraldImage.src = "Emerald_JE3_BE3.webp";
+  const backgroundImage = loadImage("26262708.png");
+  const diamondImage = loadImage("Diamond_JE3_BE3.png");
+  const emeraldImage = loadImage("Emerald_JE3_BE3.webp");
 
   function drawBackground() {
-    if (backgroundImage.complete) {
+    if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
       context.drawImage(backgroundImage, 0, 0, WIDTH, HEIGHT);
       return;
     }
-
     const sky = context.createLinearGradient(0, 0, 0, HEIGHT);
     sky.addColorStop(0, "#10243f");
     sky.addColorStop(1, "#1d3a1f");
     context.fillStyle = sky;
     context.fillRect(0, 0, WIDTH, HEIGHT);
-
     context.fillStyle = "#ffffff";
-    for (let i = 0; i < 28; i += 1) {
-      const x = (i * 83 + 17) % WIDTH;
-      const y = (i * 47 + 13) % 170;
-      context.fillRect(x, y, 2, 2);
+    for (let i = 0; i < 32; i += 1) {
+      context.fillRect((i * 83 + 17) % WIDTH, (i * 47 + 13) % 190, 3, 3);
     }
-
-    context.fillStyle = "#18281d";
-    context.fillRect(0, HEIGHT - 14, WIDTH, 14);
-    context.fillStyle = "#35502b";
-    context.fillRect(0, HEIGHT - 14, WIDTH, 4);
+    context.fillStyle = "#302016";
+    context.fillRect(0, HEIGHT - 18, WIDTH, 18);
   }
 
-  function drawTntSprite() {
-    context.fillStyle = "#a72f25";
-    context.fillRect(-12, -10, 24, 20);
-    context.fillStyle = "#e45a3f";
-    context.fillRect(-12, -10, 24, 4);
+  function drawTnt(x, y) {
+    context.fillStyle = "#9e3026";
+    context.fillRect(x - 13, y - 11, 26, 22);
+    context.fillStyle = "#ed6545";
+    context.fillRect(x - 13, y - 11, 26, 5);
     context.fillStyle = "#f6ecd2";
     context.font = "bold 9px Rubik, sans-serif";
     context.textAlign = "center";
-    context.fillText("TNT", 0, 4);
+    context.fillText("TNT", x, y + 5);
     context.fillStyle = "#d8c49b";
-    context.fillRect(-4, -14, 8, 4);
-  }
-
-  function drawCrystalSprite(image, tint) {
-    if (image && image.complete) {
-      context.drawImage(image, -14, -14, 28, 28);
-      return;
-    }
-
-    context.fillStyle = tint;
-    context.beginPath();
-    context.moveTo(0, -13);
-    context.lineTo(11, -4);
-    context.lineTo(8, 10);
-    context.lineTo(0, 14);
-    context.lineTo(-8, 10);
-    context.lineTo(-11, -4);
-    context.closePath();
-    context.fill();
-    context.fillStyle = tint === "#18a968" ? "#8affbd" : "#b6fff1";
-    context.beginPath();
-    context.moveTo(-2, -8);
-    context.lineTo(3, -5);
-    context.lineTo(1, 4);
-    context.lineTo(-4, 1);
-    context.closePath();
-    context.fill();
+    context.fillRect(x - 4, y - 15, 8, 4);
   }
 
   function drawItem(item) {
-    context.save();
-    context.translate(Math.round(item.x), Math.round(item.y));
-
     if (item.type === "tnt") {
-      drawTntSprite();
-    } else if (item.type === "emerald") {
-      drawCrystalSprite(emeraldImage, "#18a968");
-    } else {
-      drawCrystalSprite(diamondImage, "#1fb5a6");
+      drawTnt(Math.round(item.x), Math.round(item.y));
+      return;
     }
-
-    context.restore();
+    const image = item.type === "emerald" ? emeraldImage : diamondImage;
+    if (image.complete && image.naturalWidth > 0) {
+      context.drawImage(image, Math.round(item.x - 16), Math.round(item.y - 16), 32, 32);
+      return;
+    }
+    context.fillStyle = item.type === "emerald" ? "#25d879" : "#36e6db";
+    context.beginPath();
+    context.moveTo(item.x, item.y - 14);
+    context.lineTo(item.x + 12, item.y - 4);
+    context.lineTo(item.x + 9, item.y + 10);
+    context.lineTo(item.x, item.y + 15);
+    context.lineTo(item.x - 9, item.y + 10);
+    context.lineTo(item.x - 12, item.y - 4);
+    context.closePath();
+    context.fill();
   }
 
   function drawPlayer() {
     const x = Math.round(player.x - player.width / 2);
-    context.fillStyle = "#6e421e";
+    context.fillStyle = "#553316";
     context.fillRect(x, player.y, player.width, player.height);
     context.fillStyle = "#a96b2d";
     context.fillRect(x + 4, player.y + 4, player.width - 8, player.height - 8);
-    context.fillStyle = "#d3a456";
+    context.fillStyle = "#e4b85e";
     context.fillRect(x + 8, player.y + 7, player.width - 16, 3);
     context.fillStyle = "#f5c542";
-    context.fillRect(player.x - 5, player.y + 10, 10, 8);
+    context.fillRect(player.x - 5, player.y + 11, 10, 9);
     context.fillStyle = "#3a2600";
-    context.fillRect(player.x - 2, player.y + 12, 4, 4);
+    context.fillRect(player.x - 2, player.y + 13, 4, 5);
   }
 
   function drawScene() {
+    context.imageSmoothingEnabled = false;
     drawBackground();
     items.forEach(drawItem);
     drawPlayer();
   }
 
-  function updateHud() {
-    scoreOutput.textContent = String(score);
-    livesOutput.textContent = String(lives);
+  function updateOverlay() {
+    overlayTitle.textContent = `SCOR: ${score}`;
+    overlayDescription.innerHTML = `Prinde diamantele și smaraldele. Ai <b>${lives}</b> vieți. Ferește-te de TNT!`;
   }
 
-  function showEndScreen(won) {
+  function endGame(won) {
     running = false;
     cancelAnimationFrame(animationFrame);
     overlay.hidden = false;
@@ -146,7 +123,11 @@
     overlayDescription.textContent = won
       ? "Ai strâns destule diamante și smaralde. Cuvântul-cheie este gata!"
       : "Ai rămas fără vieți. Încearcă din nou și ferește-te de TNT!";
-    prize.hidden = !won;
+    prize.style.display = won ? "block" : "none";
+    if (won) {
+      keyword.textContent = atob("RWFydGhNQ1JhdG9uaWlCJkM=");
+      game.classList.add("won");
+    }
   }
 
   function spawnItem() {
@@ -154,10 +135,10 @@
     const type = roll < 0.17 ? "tnt" : roll < 0.42 ? "emerald" : "diamond";
     items.push({
       type,
-      x: 16 + Math.random() * (WIDTH - 32),
-      y: -16,
-      speed: 2.1 + Math.random() * 1.5 + score * 0.025,
-      size: type === "tnt" ? 22 : 28,
+      x: 20 + Math.random() * (WIDTH - 40),
+      y: -20,
+      speed: 2.4 + Math.random() * 1.5 + score * 0.025,
+      size: type === "tnt" ? 24 : 30,
     });
   }
 
@@ -170,13 +151,12 @@
     if (!running) return;
     const delta = Math.min((time - lastTime) / 16.67 || 1, 2);
     lastTime = time;
-
     if (keys.has("ArrowLeft") || keys.has("a")) player.x -= player.speed * delta;
     if (keys.has("ArrowRight") || keys.has("d")) player.x += player.speed * delta;
     player.x = Math.max(player.width / 2, Math.min(WIDTH - player.width / 2, player.x));
 
     spawnTimer += delta;
-    if (spawnTimer > 34) {
+    if (spawnTimer > 30) {
       spawnItem();
       spawnTimer = 0;
     }
@@ -188,22 +168,20 @@
         if (item.type === "tnt") lives -= 1;
         else score += item.type === "emerald" ? 3 : 1;
         items.splice(i, 1);
-        updateHud();
         if (score >= TARGET_SCORE) {
           drawScene();
-          showEndScreen(true);
+          endGame(true);
           return;
         }
         if (lives <= 0) {
           drawScene();
-          showEndScreen(false);
+          endGame(false);
           return;
         }
-      } else if (item.y > HEIGHT + 20) {
+      } else if (item.y > HEIGHT + 24) {
         items.splice(i, 1);
       }
     }
-
     drawScene();
     animationFrame = requestAnimationFrame(tick);
   }
@@ -216,9 +194,11 @@
     spawnTimer = 0;
     lastTime = performance.now();
     running = true;
-    prize.hidden = true;
+    game.classList.remove("won");
+    prize.style.display = "none";
+    keyword.textContent = "";
     overlay.hidden = true;
-    updateHud();
+    drawScene();
     cancelAnimationFrame(animationFrame);
     animationFrame = requestAnimationFrame(tick);
   }
@@ -236,7 +216,6 @@
   canvas.addEventListener("pointerdown", (event) => {
     if (running) movePlayerFromPointer(event);
   });
-
   document.addEventListener("keydown", (event) => {
     if (["ArrowLeft", "ArrowRight"].includes(event.key)) event.preventDefault();
     keys.add(event.key);
@@ -253,6 +232,6 @@
     }
   });
 
-  updateHud();
+  prize.style.display = "none";
   drawScene();
 })();

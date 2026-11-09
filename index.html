@@ -6,15 +6,31 @@
   <title>Vânătoarea de diamante · Survival-Earth</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:16px;font:16px/1.6 Rubik,system-ui,sans-serif;color:#f6ecd2;background:linear-gradient(#3f7be0,#78b5f9 30%,#1d3c16 100%)}.game{width:100%;max-width:520px;text-align:center;padding:20px 14px;border:3px solid #000;background:#1b1208;box-shadow:inset 0 0 0 3px #d4a017,0 10px 40px #0008}h1{margin:0;font:400 clamp(13px,3.8vw,19px)/1.6 'Press Start 2P',monospace;color:#f5c542;text-shadow:3px 3px #3a2600}.gbox{position:relative;margin:14px auto 0;border:4px solid #000;box-shadow:0 0 0 3px #d4a017}.gc{display:block;width:100%;height:auto;touch-action:none;background:linear-gradient(#10243f,#1d3a1f);cursor:ew-resize;image-rendering:pixelated}.gov{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:10px;padding:14px;background:#0a0705ea}.gt{font:400 clamp(.8rem,3.6vw,1.1rem)/1.5 'Press Start 2P',monospace;color:#f5c542}.gd{max-width:380px;font-size:.92rem;color:#ecdfba}.btn{display:inline-block;padding:11px 22px;font:700 .95rem Rubik,sans-serif;cursor:pointer;text-decoration:none;color:#1a1206;background:linear-gradient(#ffe27a,#f0a800);border:3px solid #000;border-radius:0;box-shadow:0 5px 0 #000;transition:filter .12s ease}.btn:hover{filter:brightness(1.1)}.prize{display:none}.game.won .prize{display:block}.game.won .gbox{display:none}.kw{display:block;margin:12px 0 14px;font:400 clamp(.8rem,4.2vw,1.3rem) 'Press Start 2P',monospace;color:#f5c542;word-break:break-all;user-select:all}.lk{margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.lk .btn{font-size:.8rem;padding:8px 14px}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;padding:16px;font:16px/1.6 Rubik,system-ui,sans-serif;color:#f6ecd2;background:linear-gradient(#3f7be0,#78b5f9 30%,#1d3c16 100%)}
+    .game{width:100%;max-width:800px;text-align:center;padding:20px 14px;border:3px solid #000;background:#1b1208;box-shadow:inset 0 0 0 3px #d4a017,0 10px 40px #0008}
+    h1{margin:0;font:400 clamp(13px,3.8vw,22px)/1.6 'Press Start 2P',monospace;color:#f5c542;text-shadow:3px 3px #3a2600}
+    .gbox{position:relative;width:min(100%,720px);margin:14px auto 0;border:4px solid #000;box-shadow:0 0 0 3px #d4a017}
+    .gc{display:block;width:100%;height:auto;touch-action:none;background:#10243f;cursor:ew-resize;image-rendering:pixelated}
+    .gov{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:10px;padding:14px;background:rgba(5,9,13,.58)}
+    .gov[hidden]{display:none}
+    .gt{font:400 clamp(.8rem,3.6vw,1.1rem)/1.5 'Press Start 2P',monospace;color:#f5c542}
+    .gd{max-width:480px;font-size:.92rem;color:#fff4d8;text-shadow:1px 1px #000}
+    .btn{display:inline-block;padding:11px 22px;font:700 .95rem Rubik,sans-serif;cursor:pointer;text-decoration:none;color:#1a1206;background:linear-gradient(#ffe27a,#f0a800);border:3px solid #000;border-radius:0;box-shadow:0 5px 0 #000;transition:filter .12s ease}
+    .btn:hover{filter:brightness(1.1)}
+    .prize{display:none}.game.won .prize{display:block}.game.won .gbox{display:none}
+    .kw{display:block;margin:12px 0 14px;font:400 clamp(.8rem,4.2vw,1.3rem) 'Press Start 2P',monospace;color:#f5c542;word-break:break-all;user-select:all}
+    .lk{margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.lk .btn{font-size:.8rem;padding:8px 14px}
+    @media(max-width:520px){body{padding:8px}.game{padding:16px 10px}.gd{font-size:.82rem}.lk{flex-direction:column}.lk .btn{width:100%}}
   </style>
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <div class="game">
+  <main class="game">
     <h1>⛏ Vânătoarea de diamante</h1>
     <p style="margin:10px 0 0;color:#c9b886;font-size:.9rem">Aici este păzit cuvântul-cheie pentru Staff Apply.</p>
     <div class="gbox">
-      <canvas class="gc" width="480" height="360"></canvas>
+      <canvas class="gc" width="720" height="480" aria-label="Mini-joc: prinde diamante și smaralde"></canvas>
       <div class="gov">
         <div class="gt">DIAMANTE</div>
         <div class="gd">Mișcă cufărul (mouse, deget sau tastele ← →) și prinde <b>20 de puncte</b>: diamant = 1, smarald = 3. Ferește-te de TNT! Ai 3 vieți.</div>
@@ -22,14 +38,10 @@
       </div>
     </div>
     <div class="prize">🏆 Felicitări! Cuvântul-cheie este:<span class="gold kw"></span><button type="button" class="btn kc">📋 Copiază cuvântul-cheie</button></div>
-    <div class="lk">
+    <nav class="lk" aria-label="Navigare">
       <a class="btn" href="https://panel.ratonii.ro/rules/view?id=29">⬅ Înapoi la regulament</a>
       <a class="btn" href="https://panel.ratonii.ro/staff-apply">📖 Aplică pentru Staff</a>
-    </div>
-  </div>
-
-  <script>
-    document.querySelector('.gs').onclick=function(){var b=this,g=b.closest('.game'),cv=g.querySelector('canvas'),cx=cv.getContext('2d'),ov=g.querySelector('.gov'),W=480,H=360,A=window.erA||(window.erA={}),tm=0;cx.imageSmoothingEnabled=false;function spr(r,p){var c=document.createElement('canvas');c.width=c.height=8;var x=c.getContext('2d');r.forEach(function(s,j){for(var i=0;i<8;i++){if(p[s.charAt(i)]){x.fillStyle=p[s.charAt(i)];x.fillRect(i,j,1,1)}}});return c};var G={d:spr(['...cc...','..cwcc..','.cwccdc.','cwccccdd','.ccccdd.','..cdddd.','...dd...','........'],{c:'#4aedd9',d:'#1fb5a6',w:'#fff'}),e:spr(['...cc...','..cwcc..','.cwccdc.','cwccccdd','.ccccdd.','..cdddd.','...dd...','........'],{c:'#4aedd9',d:'#1fb5a6',w:'#fff'}),t:spr(['........','..cc....','..cce...','..ccdd..','..cccc..','..ddc...','...d....','........'],{c:'#111',d:'#d7592d'}),x:spr(['........','....cc..','...cccc.','..cccc..','.cc..c..','..c..c..','........','........'],{c:'#f6e8b3',d:'#f6e8b3'}),r:spr(['........','....cc..','...cddc.','..cdddd.','..cddd..','...cdd..','....cc..','........'],{c:'#ffcb59',d:'#ff8f0e'}),p:spr(['........','...cc...','..cddc..','.cddddc.','..cdddd.','...cc...','........','........'],{c:'#76e6b4',d:'#1ea66f'})};var bgImg=new Image();bgImg.src='26262708.png';var diamondImg=new Image();diamondImg.src='Diamond_JE3_BE3.png';var emeraldImg=new Image();emeraldImg.src='Emerald_JE3_BE3.webp';function drawBg(){if(bgImg.complete){cx.drawImage(bgImg,0,0,W,H);return;}var bg=cx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#10243f');bg.addColorStop(1,'#1d3a1f');cx.fillStyle=bg;cx.fillRect(0,0,W,H);for(var i=0;i<30;i++){cx.fillStyle='#fff';cx.fillRect((i*83+17)%W,((i*47+13)%170),2,2)}};function drawItemSprite(it){if(it.type==='tnt'){cx.drawImage(G.t, Math.round(it.x)-12, Math.round(it.y)-12, 24, 24);return;}var img=it.type==='emerald'?emeraldImg:diamondImg;if(img.complete){cx.drawImage(img, Math.round(it.x)-14, Math.round(it.y)-14, 28, 28);return;}cx.drawImage(it.type==='emerald'?G.p:G.r, Math.round(it.x)-12, Math.round(it.y)-12, 24, 24)};function beep(f,d){try{A.ac=A.ac||new(window.AudioContext||window.webkitAudioContext)();var o=A.ac.createOscillator(),q=A.ac.createGain();o.type='square';o.frequency.value=f;q.gain.value=.06;q.connect(A.ac.destination);o.connect(q);o.start();setTimeout(function(){o.stop();q.disconnect();},d*1000)}catch(e){}};function reset(){A.run=0;A.items=[];A.px=W/2;A.score=0;A.lives=3;A.last=0;g.querySelector('.kw').textContent='';g.classList.remove('won');ov.style.display='grid';g.querySelector('.gt').textContent='DIAMANTE';g.querySelector('.gd').innerHTML='Mișcă cufărul (mouse, deget sau tastele ← →) și prinde <b>20 de puncte</b>: diamant = 1, smarald = 3. Ferește-te de TNT! Ai 3 vieți.';}function spawn(){var roll=Math.random();var type=roll<.17?'tnt':roll<.42?'emerald':'diamond';A.items.push({type:type,x:18+Math.random()*(W-36),y:-20,speed:2+Math.random()*2+Math.min(A.score*.03,1.2),w:type==='tnt'?22:28,h:type==='tnt'?20:28});}function end(w){A.run=0;clearInterval(A.loop);if(w){g.querySelector('.kw').textContent=atob('RWFydGhNQ1JhdG9uaWlCJkM=');g.classList.add('won');beep(990,.3)}else{g.querySelector('.gt').textContent='AI PIERDUT';g.querySelector('.gd').textContent='Încearcă din nou și ai grijă de TNT!';beep(180,.25)}ov.style.display='grid';}function tick(){if(!A.run)return;var nt=performance.now();var delta=Math.min((nt-A.last)/16.67||1,2);A.last=nt;if((A.keyLeft||A.keyRight)&&(A.keyLeft^A.keyRight)){A.px+=A.keyLeft?-28:28;A.px=Math.max(32,Math.min(W-32,A.px))}if(A.mouse){var r=cv.getBoundingClientRect();A.px=Math.max(32,Math.min(W-32,(A.mouse-r.left)/r.width*W))}spawn();A.items.forEach(function(it){it.y += it.speed*delta;});for(var i=A.items.length-1;i>=0;i--){var it=A.items[i];if(it.y>H+26){A.items.splice(i,1);continue;}var hit=Math.abs(it.x-A.px)<(it.w+24)/2&&Math.abs(it.y-(H-16))<(it.h+22)/2;if(hit){if(it.type==='tnt'){A.lives--;beep(120,.18);}else{A.score+=it.type==='emerald'?3:1;beep(540,.09);}A.items.splice(i,1);if(A.score>=20){end(true);return;}if(A.lives<=0){end(false);return;}}}drawBg();A.items.forEach(drawItemSprite);cx.drawImage(G.d,Math.round(A.px-12),H-26,24,24);g.querySelector('.gd').innerHTML='Mișcă cufărul (mouse, deget sau tastele ← →) și prinde <b>20 de puncte</b>: diamant = 1, smarald = 3. Ferește-te de TNT! Ai <b>'+A.lives+'</b> vieți.';g.querySelector('.gt').textContent='SCOR: '+A.score;}if(!A.b){A.b=1;A.px=W/2;A.keyLeft=false;A.keyRight=false;A.items=[];A.score=0;A.lives=3;A.mouse=null;function mv(e){var r=cv.getBoundingClientRect();A.mouse=e.clientX-r.left;A.px=Math.max(32,Math.min(W-32,(e.clientX-r.left)/r.width*W))}cv.addEventListener('pointermove',mv);cv.addEventListener('pointerdown',mv);document.addEventListener('keydown',function(e){if(e.key==='ArrowLeft'){A.keyLeft=true;A.keyRight=false;e.preventDefault()}if(e.key==='ArrowRight'){A.keyRight=true;A.keyLeft=false;e.preventDefault()}});document.addEventListener('keyup',function(e){if(e.key==='ArrowLeft')A.keyLeft=false;if(e.key==='ArrowRight')A.keyRight=false;});}document.querySelector('.gs').onclick=function(){A.score=0;A.lives=3;A.items=[];A.px=W/2;A.run=1;A.last=performance.now();ov.style.display='none';g.classList.remove('won');A.loop=setInterval(tick,16);drawBg();};document.querySelector('.kc').onclick=function(){var t=document.querySelector('.kw').textContent;try{navigator.clipboard.writeText(t);this.textContent='✅ Copiat!';}catch(e){prompt('Copiază:',t);}};drawBg();
-  </script>
+    </nav>
+  </main>
 </body>
 </html>
