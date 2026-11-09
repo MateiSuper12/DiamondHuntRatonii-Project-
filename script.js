@@ -16,7 +16,7 @@
   const WIDTH = canvas.width;
   const HEIGHT = canvas.height;
   const TARGET_SCORE = 20;
-  const player = { x: WIDTH / 2, y: HEIGHT - 38, width: 66, height: 28, speed: 8 };
+  const player = { x: WIDTH / 2, y: HEIGHT - 38, width: 86, height: 60, speed: 8, openProgress: 0 };
   const items = [];
   const keys = new Set();
   let score = 0;
@@ -37,6 +37,8 @@
   const backgroundImage = loadImage("assets/26262708.png");
   const diamondImage = loadImage("assets/Diamond_JE3_BE3.png");
   const emeraldImage = loadImage("assets/Emerald_JE3_BE3.webp");
+  const chestClosedImage = loadImage("assets/Chest (1).webp");
+  const chestOpeningImage = loadImage("assets/Chest.gif");
 
   function drawBackground() {
     if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
@@ -69,13 +71,52 @@
     context.beginPath(); context.moveTo(item.x, item.y - 14); context.lineTo(item.x + 12, item.y - 4); context.lineTo(item.x + 9, item.y + 10); context.lineTo(item.x, item.y + 15); context.lineTo(item.x - 9, item.y + 10); context.lineTo(item.x - 12, item.y - 4); context.closePath(); context.fill();
   }
 
+  function drawChestImage(image, x, y, width, height, alpha = 1) {
+    if (!image || !image.complete || image.naturalWidth <= 0) return false;
+    context.save();
+    context.globalAlpha = alpha;
+    context.drawImage(image, x, y, width, height);
+    context.restore();
+    return true;
+  }
+
   function drawPlayer() {
     const x = Math.round(player.x - player.width / 2);
-    context.fillStyle = "#553316"; context.fillRect(x, player.y, player.width, player.height);
-    context.fillStyle = "#a96b2d"; context.fillRect(x + 4, player.y + 4, player.width - 8, player.height - 8);
-    context.fillStyle = "#e4b85e"; context.fillRect(x + 8, player.y + 7, player.width - 16, 3);
-    context.fillStyle = "#f5c542"; context.fillRect(player.x - 5, player.y + 11, 10, 9);
-    context.fillStyle = "#3a2600"; context.fillRect(player.x - 2, player.y + 13, 4, 5);
+    const y = Math.round(player.y - 12);
+    const bob = Math.sin((performance.now() || 0) / 150) * 2;
+    const chestScale = 1 + player.openProgress * 0.12;
+    const chestWidth = Math.round(player.width * chestScale);
+    const chestHeight = Math.round(player.height * chestScale);
+    const chestX = Math.round(player.x - chestWidth / 2);
+    const chestY = Math.round(y + bob);
+
+    const hasOpenGif = chestOpeningImage.complete && chestOpeningImage.naturalWidth > 0;
+    const isAnimating = player.openProgress > 0.08;
+    const activeImage = isAnimating && hasOpenGif ? chestOpeningImage : chestClosedImage;
+
+    if (drawChestImage(activeImage, chestX, chestY, chestWidth, chestHeight, isAnimating ? 0.9 + player.openProgress * 0.1 : 1)) {
+      if (player.openProgress > 0.06) {
+        context.save();
+        context.globalAlpha = 0.2 + player.openProgress * 0.45;
+        context.fillStyle = "#f5d76e";
+        context.beginPath();
+        context.arc(player.x, player.y - 5, 26 + player.openProgress * 18, 0, Math.PI * 2);
+        context.fill();
+        context.restore();
+      }
+      return;
+    }
+
+    context.fillStyle = "#553316";
+    context.fillRect(x, player.y, player.width, player.height);
+    context.fillStyle = "#a96b2d";
+    context.fillRect(x + 4, player.y + 4, player.width - 8, player.height - 8);
+    context.fillStyle = "#e4b85e";
+    context.fillRect(x + 8, player.y + 7, player.width - 16, 3);
+    context.fillStyle = "#f5c542";
+    context.fillRect(player.x - 5, player.y + 11, 10, 9);
+    context.fillStyle = "#3a2600";
+    context.fillRect(player.x - 2, player.y + 13, 4, 5);
   }
 
   function drawScene() {
@@ -119,14 +160,20 @@
     if (keys.has("ArrowLeft") || keys.has("a")) player.x -= player.speed * delta;
     if (keys.has("ArrowRight") || keys.has("d")) player.x += player.speed * delta;
     player.x = Math.max(player.width / 2, Math.min(WIDTH - player.width / 2, player.x));
+    player.openProgress = Math.max(0, player.openProgress * 0.82 - 0.03);
     spawnTimer += delta;
     if (spawnTimer > 30) { spawnItem(); spawnTimer = 0; }
 
     for (let i = items.length - 1; i >= 0; i -= 1) {
       const item = items[i]; item.y += item.speed * delta;
       if (intersects(item)) {
-        if (item.type === "tnt") lives -= 1;
-        else score += item.type === "emerald" ? 3 : 1;
+        if (item.type === "tnt") {
+          lives -= 1;
+          player.openProgress = Math.max(player.openProgress, 0.45);
+        } else {
+          score += item.type === "emerald" ? 3 : 1;
+          player.openProgress = Math.min(1, player.openProgress + 0.85);
+        }
         items.splice(i, 1);
         updateHud();
         if (score >= TARGET_SCORE) { drawScene(); endGame(true); return; }
@@ -138,7 +185,7 @@
   }
 
   function startGame() {
-    score = 0; lives = 3; player.x = WIDTH / 2; items.length = 0; spawnTimer = 0; lastTime = performance.now(); running = true;
+    score = 0; lives = 3; player.x = WIDTH / 2; player.openProgress = 0; items.length = 0; spawnTimer = 0; lastTime = performance.now(); running = true;
     game.classList.remove("won"); prize.style.display = "none"; keyword.textContent = "";
     updateHud(); hud.hidden = false; overlay.hidden = true;
     cancelAnimationFrame(animationFrame);
