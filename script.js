@@ -24,7 +24,21 @@
   let animationFrame = 0;
   const keys = new Set();
 
+  const backgroundImage = new Image();
+  backgroundImage.src = "26262708.png";
+
+  const diamondImage = new Image();
+  diamondImage.src = "Diamond_JE3_BE3.png";
+
+  const emeraldImage = new Image();
+  emeraldImage.src = "Emerald_JE3_BE3.webp";
+
   function drawBackground() {
+    if (backgroundImage.complete) {
+      context.drawImage(backgroundImage, 0, 0, WIDTH, HEIGHT);
+      return;
+    }
+
     const sky = context.createLinearGradient(0, 0, 0, HEIGHT);
     sky.addColorStop(0, "#10243f");
     sky.addColorStop(1, "#1d3a1f");
@@ -44,40 +58,57 @@
     context.fillRect(0, HEIGHT - 14, WIDTH, 4);
   }
 
+  function drawTntSprite() {
+    context.fillStyle = "#a72f25";
+    context.fillRect(-12, -10, 24, 20);
+    context.fillStyle = "#e45a3f";
+    context.fillRect(-12, -10, 24, 4);
+    context.fillStyle = "#f6ecd2";
+    context.font = "bold 9px Rubik, sans-serif";
+    context.textAlign = "center";
+    context.fillText("TNT", 0, 4);
+    context.fillStyle = "#d8c49b";
+    context.fillRect(-4, -14, 8, 4);
+  }
+
+  function drawCrystalSprite(image, tint) {
+    if (image && image.complete) {
+      context.drawImage(image, -14, -14, 28, 28);
+      return;
+    }
+
+    context.fillStyle = tint;
+    context.beginPath();
+    context.moveTo(0, -13);
+    context.lineTo(11, -4);
+    context.lineTo(8, 10);
+    context.lineTo(0, 14);
+    context.lineTo(-8, 10);
+    context.lineTo(-11, -4);
+    context.closePath();
+    context.fill();
+    context.fillStyle = tint === "#18a968" ? "#8affbd" : "#b6fff1";
+    context.beginPath();
+    context.moveTo(-2, -8);
+    context.lineTo(3, -5);
+    context.lineTo(1, 4);
+    context.lineTo(-4, 1);
+    context.closePath();
+    context.fill();
+  }
+
   function drawItem(item) {
     context.save();
     context.translate(Math.round(item.x), Math.round(item.y));
+
     if (item.type === "tnt") {
-      context.fillStyle = "#a72f25";
-      context.fillRect(-12, -10, 24, 20);
-      context.fillStyle = "#e45a3f";
-      context.fillRect(-12, -10, 24, 4);
-      context.fillStyle = "#f6ecd2";
-      context.font = "bold 9px Rubik, sans-serif";
-      context.textAlign = "center";
-      context.fillText("TNT", 0, 4);
-      context.fillStyle = "#d8c49b";
-      context.fillRect(-4, -14, 8, 4);
+      drawTntSprite();
+    } else if (item.type === "emerald") {
+      drawCrystalSprite(emeraldImage, "#18a968");
     } else {
-      context.fillStyle = item.type === "emerald" ? "#18a968" : "#1fb5a6";
-      context.beginPath();
-      context.moveTo(0, -13);
-      context.lineTo(11, -4);
-      context.lineTo(8, 10);
-      context.lineTo(0, 14);
-      context.lineTo(-8, 10);
-      context.lineTo(-11, -4);
-      context.closePath();
-      context.fill();
-      context.fillStyle = item.type === "emerald" ? "#8affbd" : "#b6fff1";
-      context.beginPath();
-      context.moveTo(-2, -8);
-      context.lineTo(3, -5);
-      context.lineTo(1, 4);
-      context.lineTo(-4, 1);
-      context.closePath();
-      context.fill();
+      drawCrystalSprite(diamondImage, "#1fb5a6");
     }
+
     context.restore();
   }
 
@@ -126,7 +157,7 @@
       x: 16 + Math.random() * (WIDTH - 32),
       y: -16,
       speed: 2.1 + Math.random() * 1.5 + score * 0.025,
-      size: type === "tnt" ? 22 : 24,
+      size: type === "tnt" ? 22 : 28,
     });
   }
 
