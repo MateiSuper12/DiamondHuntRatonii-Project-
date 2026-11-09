@@ -3,34 +3,56 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#18304c">
-  <meta name="description" content="Joacă Vânătoarea de diamante pe Survival-Earth și descoperă cuvântul-cheie pentru Staff Apply.">
+  <meta name="theme-color" content="#101a2d">
+  <meta name="description" content="Joacă Vânătoarea de diamante pe Survival-Earth. Prinde diamante și smaralde, evită TNT-ul și încearcă provocarea!">
+  <link rel="canonical" href="https://mateisuper12.github.io/DiamondHuntRatonii-Project-/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Vânătoarea de diamante · Survival-Earth">
+  <meta property="og:description" content="Un mini-joc retro pentru comunitatea Ratonii. Prinde diamante și smaralde și ferește-te de TNT!">
+  <meta property="og:url" content="https://mateisuper12.github.io/DiamondHuntRatonii-Project-/">
+  <meta property="og:image" content="https://mateisuper12.github.io/DiamondHuntRatonii-Project-/banner.svg">
   <title>Vânătoarea de diamante · Survival-Earth</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
 <body>
-  <main class="game" id="game">
-    <header class="intro">
-      <p class="eyebrow">SURVIVAL-EARTH · RATONII</p>
-      <h1>⛏ Vânătoarea de diamante</h1>
-      <p class="description">Aici este păzit cuvântul-cheie pentru Staff Apply.</p>
+  <main class="page-shell" id="game">
+    <header class="hero">
+      <img class="hero-banner" src="banner.svg" alt="Banner ilustrat Vânătoarea de diamante, Survival-Earth">
+      <div class="hero-content">
+        <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> EXPERIENȚĂ SURVIVAL-EARTH</p>
+        <h1>Vânătoarea<br class="title-break"> de diamante</h1>
+        <p class="description">Prinde comorile. Ferește-te de TNT. Descoperă provocarea.</p>
+        <a class="button hero-cta" href="#play">Începe aventura <span aria-hidden="true">↓</span></a>
+      </div>
+      <div class="hero-badge" aria-label="Joc retro arcade">✦<span>RETRO<br>ARCADE</span></div>
     </header>
 
-    <section class="game-area" aria-label="Mini-joc Vânătoarea de diamante">
-      <div class="hud" aria-live="polite">
-        <span>Scor: <strong id="score">0</strong> / 20</span>
-        <span>Vieți: <strong id="lives">3</strong></span>
+    <section class="game-panel" id="play" aria-label="Mini-joc Vânătoarea de diamante">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">PROVOCAREA TA</p>
+          <h2>Pregătit de vânătoare?</h2>
+        </div>
+        <span class="live-pill"><span aria-hidden="true"></span> JOACĂ ACUM</span>
       </div>
+
+      <div class="hud" aria-live="polite">
+        <div class="hud-card"><span class="hud-icon" aria-hidden="true">◆</span><span>SCOR</span><strong><span id="score">0</span><small> / 20</small></strong></div>
+        <div class="hud-card"><span class="hud-icon heart-icon" aria-hidden="true">♥</span><span>VIEȚI</span><strong id="lives">3</strong></div>
+      </div>
+
       <div class="canvas-wrap">
         <canvas class="game-canvas" id="game-canvas" width="480" height="360" aria-label="Prinde diamantele și smaraldele, evită TNT-ul"></canvas>
         <div class="overlay" id="overlay">
-          <h2 class="overlay-title" id="overlay-title">DIAMANTE</h2>
+          <div class="overlay-emblem" aria-hidden="true">◆</div>
+          <p class="overlay-kicker">O AVENTURĂ TE AȘTEAPTĂ</p>
+          <h3 class="overlay-title" id="overlay-title">DIAMANTE</h3>
           <p class="overlay-description" id="overlay-description">Mișcă cufărul cu mouse-ul, degetul sau tastele ← → și prinde 20 de puncte. Diamant = 1, smarald = 3. Ferește-te de TNT! Ai 3 vieți.</p>
-          <button class="button" id="start-button" type="button">START</button>
+          <button class="button start-button" id="start-button" type="button">START JOC <span aria-hidden="true">→</span></button>
         </div>
       </div>
 
@@ -40,13 +62,46 @@
         <strong class="keyword" id="keyword">EarthMCRatoniiB&amp;C</strong>
         <button class="button copy-button" id="copy-button" type="button">📋 Copiază cuvântul-cheie</button>
       </section>
+
+      <div class="controls-row">
+        <span><kbd>←</kbd><kbd>→</kbd> Taste săgeată</span>
+        <span class="controls-divider" aria-hidden="true"></span>
+        <span>Mouse sau ecran tactil</span>
+      </div>
     </section>
 
-    <nav class="links" aria-label="Linkuri utile">
-      <a class="button button-secondary" href="https://panel.ratonii.ro/rules/view?id=29">⬅ Înapoi la regulament</a>
-      <a class="button button-secondary" href="https://panel.ratonii.ro/staff-apply">📖 Aplică pentru Staff</a>
-    </nav>
-    <p class="controls-hint">Poți juca și folosind tastele săgeată stânga și dreapta.</p>
+    <section class="info-section" aria-labelledby="how-to-title">
+      <div class="section-heading info-heading">
+        <div>
+          <p class="section-kicker">GHID RAPID</p>
+          <h2 id="how-to-title">Cum se joacă</h2>
+        </div>
+        <span class="info-number">01 — 03</span>
+      </div>
+      <div class="guide-grid">
+        <article class="guide-card">
+          <span class="guide-icon diamond" aria-hidden="true">◆</span>
+          <div><h3>Adună comori</h3><p>Prinde diamantele pentru 1 punct și smaraldele pentru 3.</p></div>
+          <span class="guide-value">+1 / +3</span>
+        </article>
+        <article class="guide-card">
+          <span class="guide-icon tnt" aria-hidden="true">TNT</span>
+          <div><h3>Evită TNT-ul</h3><p>Ferește cufărul de TNT — fiecare atingere costă o viață.</p></div>
+          <span class="guide-value danger">−1 viață</span>
+        </article>
+        <article class="guide-card">
+          <span class="guide-icon trophy" aria-hidden="true">✦</span>
+          <div><h3>Ajungi la 20</h3><p>Strânge punctele necesare și completează provocarea.</p></div>
+          <span class="guide-value">Țintă: 20</span>
+        </article>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <a class="button button-secondary" href="https://panel.ratonii.ro/rules/view?id=29">← Regulamentul</a>
+      <a class="button button-secondary" href="https://panel.ratonii.ro/staff-apply">Aplică pentru Staff ↗</a>
+      <p>Creat pentru comunitatea <strong>Ratonii</strong> <span aria-hidden="true">·</span> <a href="https://mateisuper12.github.io/DiamondHuntRatonii-Project-/">mateisuper12.github.io</a></p>
+    </footer>
   </main>
 </body>
 </html>
