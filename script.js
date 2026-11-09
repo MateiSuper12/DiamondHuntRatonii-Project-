@@ -34,9 +34,9 @@
     return image;
   }
 
-  const backgroundImage = loadImage("26262708.png");
-  const diamondImage = loadImage("Diamond_JE3_BE3.png");
-  const emeraldImage = loadImage("Emerald_JE3_BE3.webp");
+  const backgroundImage = loadImage("assets/26262708.png");
+  const diamondImage = loadImage("assets/Diamond_JE3_BE3.png");
+  const emeraldImage = loadImage("assets/Emerald_JE3_BE3.webp");
 
   function drawBackground() {
     if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
