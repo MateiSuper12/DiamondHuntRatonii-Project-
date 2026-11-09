@@ -29,34 +29,24 @@
   let animationFrame = 0;
   let chestGifTimer = 0;
   let chestGifRequest = 0;
+  let chestGifVisible = false;
 
-  // Use a real HTML <img> for the GIF. Browsers animate GIFs in an image element;
-  // drawing a GIF to canvas may leave it looking like a still frame.
+  // Use an HTML image so the browser plays the animated GIF. It is aligned to
+  // the collector's canvas position and fully replaces the closed chest.
   const chestGif = document.createElement("img");
-  chestGif.alt = "Cufăr care se deschide la colectarea unui minereu";
+  chestGif.alt = "Cufăr care se deschide";
   chestGif.setAttribute("aria-hidden", "true");
   Object.assign(chestGif.style, {
     position: "absolute",
     display: "none",
     zIndex: "2",
-    width: "110px",
-    height: "110px",
     objectFit: "contain",
     pointerEvents: "none",
-    transform: "translate(-50%, -72%)",
-    imageRendering: "auto"
+    margin: "0",
+    padding: "0",
+    border: "0"
   });
   gameBox.appendChild(chestGif);
-
-  const chestGifStyle = document.createElement("style");
-  chestGifStyle.textContent = `
-    @keyframes chest-gif-pop {
-      0% { opacity: .25; scale: .72; }
-      65% { opacity: 1; scale: 1.12; }
-      100% { opacity: 1; scale: 1; }
-    }
-  `;
-  document.head.appendChild(chestGifStyle);
 
   function loadImage(path) {
     const image = new Image();
@@ -71,29 +61,44 @@
   const emeraldImage = loadImage("assets/Emerald_JE3_BE3.webp");
   const chestClosedImage = loadImage("assets/Chest (1).webp");
 
+  function positionChestGif() {
+    const canvasRect = canvas.getBoundingClientRect();
+    const boxRect = gameBox.getBoundingClientRect();
+    const originX = canvasRect.left - boxRect.left - gameBox.clientLeft;
+    const originY = canvasRect.top - boxRect.top - gameBox.clientTop;
+    chestGif.style.left = `${originX + (player.x - player.width / 2) / WIDTH * canvasRect.width}px`;
+    chestGif.style.top = `${originY + (player.y - 12) / HEIGHT * canvasRect.height}px`;
+    chestGif.style.width = `${player.width / WIDTH * canvasRect.width}px`;
+    chestGif.style.height = `${player.height / HEIGHT * canvasRect.height}px`;
+  }
+
   function playChestAnimation() {
     const request = ++chestGifRequest;
     window.clearTimeout(chestGifTimer);
+    chestGifVisible = false;
+    chestGif.style.display = "none";
 
-    // Reassigning a fresh URL restarts the animated GIF on every collected gem.
     const gifUrl = new URL("assets/Chest.gif", document.baseURI);
     gifUrl.searchParams.set("play", `${Date.now()}-${request}`);
-    chestGif.style.left = `${(player.x / WIDTH) * 100}%`;
-    chestGif.style.top = `${(player.y / HEIGHT) * 100}%`;
-    chestGif.style.display = "block";
-    chestGif.style.animation = "none";
-    void chestGif.offsetWidth;
-    chestGif.style.animation = "chest-gif-pop 260ms ease-out";
     chestGif.onload = () => {
       if (request !== chestGifRequest) return;
+      positionChestGif();
+      chestGifVisible = true;
+      chestGif.style.display = "block";
+      drawScene();
       chestGifTimer = window.setTimeout(() => {
-        if (request === chestGifRequest) chestGif.style.display = "none";
+        if (request !== chestGifRequest) return;
+        chestGifVisible = false;
+        chestGif.style.display = "none";
+        drawScene();
       }, CHEST_ANIMATION_MS);
     };
     chestGif.onerror = () => {
       if (request !== chestGifRequest) return;
+      chestGifVisible = false;
       chestGif.style.display = "none";
       console.error(`Nu s-a putut încărca animația cufărului: ${gifUrl.href}`);
+      drawScene();
     };
     chestGif.src = gifUrl.href;
   }
@@ -124,12 +129,27 @@
   function drawItem(item) {
     if (item.type === "tnt") { drawTnt(Math.round(item.x), Math.round(item.y)); return; }
     const image = item.type === "emerald" ? emeraldImage : diamondImage;
-    if (image.complete && image.naturalWidth > 0) { context.drawImage(image, Math.round(item.x - 16), Math.round(item.y - 16), 32, 32); return; }
+    if (image.complete && image.naturalWidth > 0) {
+      context.drawImage(image, Math.round(item.x - 16), Math.round(item.y - 16), 32, 32);
+      return;
+    }
     context.fillStyle = item.type === "emerald" ? "#25d879" : "#36e6db";
-    context.beginPath(); context.moveTo(item.x, item.y - 14); context.lineTo(item.x + 12, item.y - 4); context.lineTo(item.x + 9, item.y + 10); context.lineTo(item.x, item.y + 15); context.lineTo(item.x - 9, item.y + 10); context.lineTo(item.x - 12, item.y - 4); context.closePath(); context.fill();
+    context.beginPath();
+    context.moveTo(item.x, item.y - 14);
+    context.lineTo(item.x + 12, item.y - 4);
+    context.lineTo(item.x + 9, item.y + 10);
+    context.lineTo(item.x, item.y + 15);
+    context.lineTo(item.x - 9, item.y + 10);
+    context.lineTo(item.x - 12, item.y - 4);
+    context.closePath();
+    context.fill();
   }
 
   function drawPlayer() {
+    // Hide the closed chest while the GIF plays, so the GIF replaces it rather
+    // than appearing as a second chest on top.
+    if (chestGifVisible) return;
+
     const x = Math.round(player.x - player.width / 2);
     const y = Math.round(player.y - 12);
     if (chestClosedImage.complete && chestClosedImage.naturalWidth > 0) {
@@ -191,6 +211,8 @@
     if (keys.has("ArrowLeft") || keys.has("a")) player.x -= player.speed * delta;
     if (keys.has("ArrowRight") || keys.has("d")) player.x += player.speed * delta;
     player.x = Math.max(player.width / 2, Math.min(WIDTH - player.width / 2, player.x));
+    // Reposition the playing GIF with the moving collector each frame.
+    if (chestGifVisible) positionChestGif();
     spawnTimer += delta;
     if (spawnTimer > 30) { spawnItem(); spawnTimer = 0; }
 
@@ -216,6 +238,7 @@
     score = 0; lives = 3; player.x = WIDTH / 2; items.length = 0; spawnTimer = 0;
     window.clearTimeout(chestGifTimer);
     chestGifRequest += 1;
+    chestGifVisible = false;
     chestGif.style.display = "none";
     chestGif.removeAttribute("src");
     lastTime = performance.now(); running = true;
@@ -229,6 +252,7 @@
     const rect = canvas.getBoundingClientRect();
     player.x = ((event.clientX - rect.left) / rect.width) * WIDTH;
     player.x = Math.max(player.width / 2, Math.min(WIDTH - player.width / 2, player.x));
+    if (chestGifVisible) positionChestGif();
   }
 
   startButton.addEventListener("click", startGame);
@@ -237,6 +261,7 @@
   document.addEventListener("keydown", (event) => { if (["ArrowLeft", "ArrowRight"].includes(event.key)) event.preventDefault(); keys.add(event.key); });
   document.addEventListener("keyup", (event) => keys.delete(event.key));
   window.addEventListener("blur", () => keys.clear());
+  window.addEventListener("resize", () => { if (chestGifVisible) positionChestGif(); });
 
   copyButton.addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(keyword.textContent); copyButton.textContent = "✅ Copiat!"; }
