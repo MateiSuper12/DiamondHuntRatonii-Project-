@@ -1,186 +1,97 @@
-# DiamondHuntRatonii
+# Diamond Hunt Ratonii
 
-## RO / Română
+[Joacă jocul / Play the game](https://mateisuperion-blip.github.io/DiamondHuntRatonii-Project-/)
 
-Un mini-joc web creat pentru comunitatea Survival-Earth de pe serverul `mc.ratonii.ro`. Proiectul este o variantă simplă, dar modernă, de „diamond hunt” / „vânătoare de diamante”, cu un stil retro și o tematică inspirată de Minecraft.
+## RO · Română
 
-### Despre proiect
-
-Acest repository conține o pagină web completă, publicată prin GitHub Pages, unde jucătorul poate:
-
-- mișca căruciorul cu mouse-ul sau tastatura;
-- colecta diamante și smaralde;
-- evita TNT-ul;
-- câștiga puncte și vieți;
-- obține un cuvânt-cheie la final, în stilul unei provocări comunitare.
+Mini-joc web creat pentru comunitatea Survival-Earth de pe serverul `mc.ratonii.ro`. Prinde diamante și smaralde pentru a ajunge la 20 de puncte și ferește-te de TNT!
 
 ### Caracteristici
 
-- design modern, compatibil cu dispozitive mobile;
-- animații și efecte sonore simple;
-- interfață în limba română;
-- structura proiectului separată în `index.html`, `style.css` și `script.js`;
+- Poți controla jocul cu mouse-ul, ecranul tactil sau săgețile stânga/dreapta.
+- Diamantele valorează 1 punct, smaraldele 3 puncte.
+- Ai 3 vieți; TNT-ul îți scade câte una.
+- Interfață adaptată pentru dispozitive mobile.
 
-### Structura proiectului
+### Fișiere
 
 ```text
-jocdiamanteratonii/
+DiamondHuntRatonii-Project-/
 ├── index.html
 ├── style.css
 ├── script.js
-├── README.md
-└── assets/   (opțional, dacă adăugăm imagini sau resurse suplimentare)
+└── README.md
 ```
 
-### Cum rulează local
+### Rulează local
 
-1. Clonează repository-ul:
+Clonează repository-ul și deschide `index.html` în browser:
 
 ```bash
-git clone https://github.com/mateisuperion-blip/jocdiamanteratonii.git
+git clone https://github.com/mateisuperion-blip/DiamondHuntRatonii-Project-.git
+cd DiamondHuntRatonii-Project-
 ```
 
-2. Intră în folderul proiectului:
-
-```bash
-cd jocdiamanteratonii
-```
-
-3. Deschide `index.html` într-un browser.
-
-Sau poți folosi un server local simplu, de exemplu:
+Opțional, pornește un server local:
 
 ```bash
 python -m http.server 8000
 ```
 
-Apoi accesează:
+Apoi accesează `http://localhost:8000`.
 
-```text
-http://localhost:8000
-```
+### GitHub Pages
 
-### Publicare pe GitHub Pages
+Site-ul este publicat la [mateisuperion-blip.github.io/DiamondHuntRatonii-Project-/](https://mateisuperion-blip.github.io/DiamondHuntRatonii-Project-/). Pentru configurare, mergi în repository la **Settings → Pages** și selectează branch-ul `main` ca sursă, dacă nu este deja selectat.
 
-1. În GitHub, deschide repository-ul.
-2. Merge la `Settings` → `Pages`.
-3. Selectează branch-ul `main`.
-4. Salvează și așteaptă ca site-ul să fie publicat.
-5. După finalizare, va apărea o adresă de tip:
+### Autor
 
-```text
-https://mateisuperion-blip.github.io/jocdiamanteratonii/
-```
-
-### Contribuții
-
-Dacă vrei să îmbunătățești proiectul, poți să:
-
-- îmbunătățești design-ul;
-- adaugi sunete și animații mai avansate;
-- faci jocul mai dificil;
-- adaugi o secțiune cu clasament / scoruri;
-- creezi versiuni noi ale mini-jocului.
-
-### Licență
-
-Acest proiect este disponibil pentru utilizare și adaptare liberă, în funcție de preferințele proprietarului repository-ului. Dacă vrei să îl folosești într-un context public, recomandă menționarea sursei originale.
+Creat de **MateiSuper** pentru comunitatea Ratonii.
 
 ---
 
-## EN / English
+## EN · English
 
-A small web mini-game created for the Survival-Earth community on the `mc.ratonii.ro` server. This project is a simple but modern version of a diamond-hunt game, with a retro Minecraft-inspired aesthetic.
-
-### About the project
-
-This repository contains a complete web page published through GitHub Pages, where the player can:
-
-- move the cart with the mouse or keyboard;
-- collect diamonds and emeralds;
-- avoid TNT;
-- earn points and lives;
-- unlock a keyword at the end in a community challenge style.
+A web mini-game made for the Survival-Earth community on the `mc.ratonii.ro` server. Catch diamonds and emeralds to reach 20 points, and avoid TNT!
 
 ### Features
 
-- modern design, compatible with mobile devices;
-- simple animations and sound effects;
-- interface in Romanian;
-- project structure split into `index.html`, `style.css`, and `script.js`;
-- ready to be published on GitHub Pages.
+- Play with a mouse, touchscreen, or the left and right arrow keys.
+- Diamonds are worth 1 point; emeralds are worth 3.
+- You have 3 lives; each TNT hit costs one life.
+- Mobile-friendly interface.
 
-### Project structure
+### Files
 
 ```text
-jocdiamanteratonii/
+DiamondHuntRatonii-Project-/
 ├── index.html
 ├── style.css
 ├── script.js
-├── README.md
-└── assets/   (optional, if more visual resources are added later)
+└── README.md
 ```
 
-### How to run locally
+### Run locally
 
-1. Clone the repository:
+Clone the repository and open `index.html` in a browser:
 
 ```bash
-git clone https://github.com/mateisuperion-blip/jocdiamanteratonii.git
+git clone https://github.com/mateisuperion-blip/DiamondHuntRatonii-Project-.git
+cd DiamondHuntRatonii-Project-
 ```
 
-2. Open the project folder:
-
-```bash
-cd jocdiamanteratonii
-```
-
-3. Open `index.html` in a browser.
-
-Or run a simple local server:
+Alternatively, start a local server:
 
 ```bash
 python -m http.server 8000
 ```
 
-Then open:
+Then visit `http://localhost:8000`.
 
-```text
-http://localhost:8000
-```
+### GitHub Pages
 
-### GitHub Pages deployment
+The game is published at [mateisuperion-blip.github.io/DiamondHuntRatonii-Project-/](https://mateisuperion-blip.github.io/DiamondHuntRatonii-Project-/). To configure publishing, open the repository's **Settings → Pages** and select the `main` branch as the source, if it is not already selected.
 
-1. Open the repository in GitHub.
-2. Go to `Settings` → `Pages`.
-3. Select the `main` branch.
-4. Save the settings and wait for the site to go live.
-5. After publishing, it will be available at:
+### Author
 
-```text
-https://mateisuperion-blip.github.io/jocdiamanteratonii/
-```
-
-### Contributions
-
-If you want to improve the project, you can:
-
-- improve the design;
-- add advanced sounds and animations;
-- make the game harder;
-- add a leaderboard / score section;
-- create new versions of the mini-game.
-
-### License
-
-This project is available for use and adaptation depending on the repository owner’s preferences. If you reuse it publicly, it is recommended to mention the original source.
-
----
-
-## Final note / Notă finală
-
-Acest proiect este un exemplu bun de pagină web interactivă, ușor de publicat și de extins. Îl poți transforma în continuare într-un joc mai complex, cu niveluri, clasament și animații mai avansate.
-
-This project is a good example of an interactive web page that is easy to publish and expand. It can continue to evolve into a more complex game with levels, rankings, and more advanced animations.
-
-Made by / Creat de: MateiSuper
+Created by **MateiSuper** for the Ratonii community.
