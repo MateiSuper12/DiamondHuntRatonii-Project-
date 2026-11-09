@@ -20,7 +20,6 @@ Acest repository conține o pagină web completă, publicată prin GitHub Pages,
 - animații și efecte sonore simple;
 - interfață în limba română;
 - structura proiectului separată în `index.html`, `style.css` și `script.js`;
-- gata pentru publicare pe GitHub Pages.
 
 ### Structura proiectului
 
