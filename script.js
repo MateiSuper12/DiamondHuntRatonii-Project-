@@ -2,6 +2,7 @@
   const canvas = document.querySelector(".gc");
   const context = canvas.getContext("2d");
   const game = document.querySelector(".game");
+  const gameBox = document.querySelector(".gbox");
   const overlay = document.querySelector(".gov");
   const overlayTitle = document.querySelector(".gt");
   const overlayDescription = document.querySelector(".gd");
@@ -16,7 +17,7 @@
   const WIDTH = canvas.width;
   const HEIGHT = canvas.height;
   const TARGET_SCORE = 20;
-  const CHEST_ANIMATION_MS = 1800;
+  const CHEST_ANIMATION_MS = 2200;
   const player = { x: WIDTH / 2, y: HEIGHT - 38, width: 86, height: 60, speed: 8 };
   const items = [];
   const keys = new Set();
@@ -26,10 +27,36 @@
   let lastTime = 0;
   let spawnTimer = 0;
   let animationFrame = 0;
-  let chestAnimationImage = null;
-  let chestAnimationUntil = 0;
-  let chestAnimationStarted = 0;
-  let chestAnimationPending = false;
+  let chestGifTimer = 0;
+  let chestGifRequest = 0;
+
+  // Use a real HTML <img> for the GIF. Browsers animate GIFs in an image element;
+  // drawing a GIF to canvas may leave it looking like a still frame.
+  const chestGif = document.createElement("img");
+  chestGif.alt = "Cufăr care se deschide la colectarea unui minereu";
+  chestGif.setAttribute("aria-hidden", "true");
+  Object.assign(chestGif.style, {
+    position: "absolute",
+    display: "none",
+    zIndex: "2",
+    width: "110px",
+    height: "110px",
+    objectFit: "contain",
+    pointerEvents: "none",
+    transform: "translate(-50%, -72%)",
+    imageRendering: "auto"
+  });
+  gameBox.appendChild(chestGif);
+
+  const chestGifStyle = document.createElement("style");
+  chestGifStyle.textContent = `
+    @keyframes chest-gif-pop {
+      0% { opacity: .25; scale: .72; }
+      65% { opacity: 1; scale: 1.12; }
+      100% { opacity: 1; scale: 1; }
+    }
+  `;
+  document.head.appendChild(chestGifStyle);
 
   function loadImage(path) {
     const image = new Image();
@@ -45,32 +72,30 @@
   const chestClosedImage = loadImage("assets/Chest (1).webp");
 
   function playChestAnimation() {
-    chestAnimationPending = true;
-    chestAnimationUntil = 0;
+    const request = ++chestGifRequest;
+    window.clearTimeout(chestGifTimer);
 
-    // Start the animation timer only after the GIF has loaded, so slow connections
-    // cannot consume the whole opening animation while the image is downloading.
+    // Reassigning a fresh URL restarts the animated GIF on every collected gem.
     const gifUrl = new URL("assets/Chest.gif", document.baseURI);
-    gifUrl.searchParams.set("play", String(Date.now()));
-    const openingImage = new Image();
-    chestAnimationImage = openingImage;
-    openingImage.addEventListener("load", () => {
-      if (chestAnimationImage !== openingImage) return;
-      chestAnimationStarted = performance.now();
-      chestAnimationUntil = chestAnimationStarted + CHEST_ANIMATION_MS;
-      chestAnimationPending = false;
-      drawScene();
-    }, { once: true });
-    openingImage.addEventListener("error", () => {
-      if (chestAnimationImage !== openingImage) return;
-      chestAnimationPending = false;
-      // Keep the closed chest visible and use the bounce as a fallback.
-      chestAnimationStarted = performance.now();
-      chestAnimationUntil = chestAnimationStarted + CHEST_ANIMATION_MS;
+    gifUrl.searchParams.set("play", `${Date.now()}-${request}`);
+    chestGif.style.left = `${(player.x / WIDTH) * 100}%`;
+    chestGif.style.top = `${(player.y / HEIGHT) * 100}%`;
+    chestGif.style.display = "block";
+    chestGif.style.animation = "none";
+    void chestGif.offsetWidth;
+    chestGif.style.animation = "chest-gif-pop 260ms ease-out";
+    chestGif.onload = () => {
+      if (request !== chestGifRequest) return;
+      chestGifTimer = window.setTimeout(() => {
+        if (request === chestGifRequest) chestGif.style.display = "none";
+      }, CHEST_ANIMATION_MS);
+    };
+    chestGif.onerror = () => {
+      if (request !== chestGifRequest) return;
+      chestGif.style.display = "none";
       console.error(`Nu s-a putut încărca animația cufărului: ${gifUrl.href}`);
-      drawScene();
-    }, { once: true });
-    openingImage.src = gifUrl.href;
+    };
+    chestGif.src = gifUrl.href;
   }
 
   function drawBackground() {
@@ -105,45 +130,20 @@
   }
 
   function drawPlayer() {
-    const now = performance.now();
-    const animating = chestAnimationPending || now < chestAnimationUntil;
-    const progress = chestAnimationPending ? 0.5 : animating
-      ? Math.max(0, 1 - (now - chestAnimationStarted) / CHEST_ANIMATION_MS)
-      : 0;
-    const pulse = animating ? Math.sin(progress * Math.PI) : 0;
-    const scale = 1 + pulse * 0.2;
-    const width = Math.round(player.width * scale);
-    const height = Math.round(player.height * scale);
-    const x = Math.round(player.x - width / 2);
-    const y = Math.round(player.y - 12 - pulse * 8);
-    const gifReady = chestAnimationImage && chestAnimationImage.complete && chestAnimationImage.naturalWidth > 0;
-    const image = animating && gifReady ? chestAnimationImage : chestClosedImage;
-
-    if (animating) {
-      // A quick squash/stretch makes the catch noticeable even before the GIF loads.
-      context.save();
-      context.globalAlpha = 0.45 + pulse * 0.3;
-      context.fillStyle = "#ffe779";
-      context.beginPath();
-      context.ellipse(player.x, player.y + 12, 38 + pulse * 9, 15 + pulse * 5, 0, 0, Math.PI * 2);
-      context.fill();
-      context.restore();
-    }
-
-    if (image && image.complete && image.naturalWidth > 0) {
+    const x = Math.round(player.x - player.width / 2);
+    const y = Math.round(player.y - 12);
+    if (chestClosedImage.complete && chestClosedImage.naturalWidth > 0) {
       context.imageSmoothingEnabled = true;
-      context.drawImage(image, x, y, width, height);
+      context.drawImage(chestClosedImage, x, y, player.width, player.height);
       context.imageSmoothingEnabled = false;
       return;
     }
-
-    // Draw the original pixel chest until the uploaded chest image is available.
     context.fillStyle = "#553316";
-    context.fillRect(x, player.y, width, height);
+    context.fillRect(x, player.y, player.width, player.height);
     context.fillStyle = "#a96b2d";
-    context.fillRect(x + 4, player.y + 4, width - 8, height - 8);
+    context.fillRect(x + 4, player.y + 4, player.width - 8, player.height - 8);
     context.fillStyle = "#e4b85e";
-    context.fillRect(x + 8, player.y + 7, width - 16, 3);
+    context.fillRect(x + 8, player.y + 7, player.width - 16, 3);
     context.fillStyle = "#f5c542";
     context.fillRect(player.x - 5, player.y + 11, 10, 9);
     context.fillStyle = "#3a2600";
@@ -214,7 +214,10 @@
 
   function startGame() {
     score = 0; lives = 3; player.x = WIDTH / 2; items.length = 0; spawnTimer = 0;
-    chestAnimationUntil = 0; chestAnimationStarted = 0; chestAnimationImage = null; chestAnimationPending = false;
+    window.clearTimeout(chestGifTimer);
+    chestGifRequest += 1;
+    chestGif.style.display = "none";
+    chestGif.removeAttribute("src");
     lastTime = performance.now(); running = true;
     game.classList.remove("won"); prize.style.display = "none"; keyword.textContent = "";
     updateHud(); hud.hidden = false; overlay.hidden = true;
