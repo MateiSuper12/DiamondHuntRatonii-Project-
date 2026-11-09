@@ -1,6 +1,6 @@
 # Diamond Hunt Ratonii
 
-[Joacă jocul / Play the game](https://mateisuperion-blip.github.io/DiamondHuntRatonii-Project-/)
+[Joacă jocul / Play the game](https://mateisuper12.github.io/DiamondHuntRatonii-Project-/)
 
 ## RO · Română
 
@@ -28,7 +28,7 @@ DiamondHuntRatonii-Project-/
 Clonează repository-ul și deschide `index.html` în browser:
 
 ```bash
-git clone https://github.com/mateisuperion-blip/DiamondHuntRatonii-Project-.git
+git clone https://github.com/MateiSuper12/DiamondHuntRatonii-Project-.git
 cd DiamondHuntRatonii-Project-
 ```
 
@@ -42,7 +42,7 @@ Apoi accesează `http://localhost:8000`.
 
 ### GitHub Pages
 
-Site-ul este publicat la [mateisuperion-blip.github.io/DiamondHuntRatonii-Project-/](https://mateisuperion-blip.github.io/DiamondHuntRatonii-Project-/). Pentru configurare, mergi în repository la **Settings → Pages** și selectează branch-ul `main` ca sursă, dacă nu este deja selectat.
+Site-ul este publicat la [mateisuper12.github.io/DiamondHuntRatonii-Project-/](https://mateisuper12.github.io/DiamondHuntRatonii-Project-/). Pentru configurare, mergi în repository la **Settings → Pages** și selectează branch-ul `main` ca sursă, dacă nu este deja selectat.
 
 ### Autor
 
@@ -76,7 +76,7 @@ DiamondHuntRatonii-Project-/
 Clone the repository and open `index.html` in a browser:
 
 ```bash
-git clone https://github.com/mateisuperion-blip/DiamondHuntRatonii-Project-.git
+git clone https://github.com/MateiSuper12/DiamondHuntRatonii-Project-.git
 cd DiamondHuntRatonii-Project-
 ```
 
@@ -90,7 +90,7 @@ Then visit `http://localhost:8000`.
 
 ### GitHub Pages
 
-The game is published at [mateisuperion-blip.github.io/DiamondHuntRatonii-Project-/](https://mateisuperion-blip.github.io/DiamondHuntRatonii-Project-/). To configure publishing, open the repository's **Settings → Pages** and select the `main` branch as the source, if it is not already selected.
+The game is published at [mateisuper12.github.io/DiamondHuntRatonii-Project-/](https://mateisuper12.github.io/DiamondHuntRatonii-Project-/). To configure publishing, open the repository's **Settings → Pages** and select the `main` branch as the source, if it is not already selected.
 
 ### Author
 
