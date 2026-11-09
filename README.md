@@ -1,4 +1,4 @@
-# jocdiamanteratonii
+# DiamondHuntRatonii
 
 ## RO / Română
 
