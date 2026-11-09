@@ -227,7 +227,7 @@
       if (intersects(item)) {
         if (item.type === "tnt") lives -= 1;
         else {
-          score += item.type === "emerald" ? 3 : 1;
+          score += item.type === "emerald" ? 2 : 1;
           playChestAnimation();
         }
         items.splice(i, 1);
@@ -272,6 +272,9 @@
     try { await navigator.clipboard.writeText(keyword.textContent); copyButton.textContent = "✅ Copiat!"; }
     catch { window.prompt("Copiază cuvântul-cheie:", keyword.textContent); }
   });
+
+  // Keep the startup instructions consistent with the scoring logic.
+  overlayDescription.innerHTML = "Mișcă cufărul (mouse, deget sau tastele ← →) și prinde <b>20 de puncte</b>: diamant = 1, smarald = 2. Ferește-te de TNT! Ai 3 vieți.";
 
   prize.style.display = "none";
   updateHud();
